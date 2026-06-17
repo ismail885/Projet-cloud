@@ -1,0 +1,22 @@
+services:
+  db:
+    image: postgres:16
+    container_name: postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: "{{ db_name }}"
+      POSTGRES_USER: "{{ db_user }}"
+      POSTGRES_PASSWORD: "{{ db_password }}"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      # Exposé uniquement sur le réseau privé des VMs
+      - "{{ db_host }}:5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U {{ db_user }} -d {{ db_name }}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata:

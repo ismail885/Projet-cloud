@@ -1,0 +1,3 @@
+# Copier en terraform.tfvars puis adapter
+libvirt_uri    = "qemu:///system"
+ssh_public_key = "ssh-ed25519 AAAA... ton_user@ta_machine"

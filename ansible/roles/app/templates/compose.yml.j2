@@ -1,0 +1,15 @@
+services:
+  web:
+    build: ./src
+    container_name: memo-app
+    restart: unless-stopped
+    environment:
+      DB_HOST: "{{ db_host }}"
+      DB_PORT: "{{ db_port }}"
+      DB_NAME: "{{ db_name }}"
+      DB_USER: "{{ db_user }}"
+      DB_PASSWORD: "{{ db_password }}"
+      APP_PORT: "{{ app_port }}"
+    ports:
+      # Joignable uniquement par le reverse proxy, sur le réseau privé
+      - "{{ app_host }}:{{ app_port }}:{{ app_port }}"

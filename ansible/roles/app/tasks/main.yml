@@ -1,0 +1,23 @@
+---
+- name: Créer le répertoire de l'application
+  file:
+    path: /opt/app
+    state: directory
+    mode: "0755"
+
+- name: Copier le code source de l'application
+  copy:
+    src: "{{ playbook_dir }}/../app/"
+    dest: /opt/app/src/
+    mode: "0644"
+
+- name: Déposer le docker-compose de l'application
+  template:
+    src: compose.yml.j2
+    dest: /opt/app/compose.yml
+    mode: "0644"
+
+- name: Builder et démarrer l'application
+  command: docker compose up -d --build
+  args:
+    chdir: /opt/app

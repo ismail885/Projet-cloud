@@ -1,0 +1,17 @@
+---
+- name: Créer le répertoire du service base de données
+  file:
+    path: /opt/db
+    state: directory
+    mode: "0755"
+
+- name: Déposer le docker-compose de PostgreSQL
+  template:
+    src: compose.yml.j2
+    dest: /opt/db/compose.yml
+    mode: "0644"
+
+- name: Démarrer PostgreSQL
+  command: docker compose up -d
+  args:
+    chdir: /opt/db
