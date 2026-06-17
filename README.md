@@ -48,6 +48,28 @@ réseau privé `10.10.0.0/24`. Cette topologie reproduit à petite échelle le
 découpage classique d'une infrastructure web (zone publique / zone applicative /
 zone données).
 
+### Réseau et accès
+
+Plan d'adressage : réseau privé NAT `10.10.0.0/24`, passerelle `10.10.0.1`,
+adresses fixes attribuées par cloud-init (`.10`, `.20`, `.30`). Le flux suit
+toujours le même chemin :
+
+```
+Client ─HTTPS:443─▶ NGINX (10.10.0.10) ─HTTP:8000─▶ App (10.10.0.20) ─TCP:5432─▶ PostgreSQL (10.10.0.30)
+```
+
+- Le trafic **HTTP (port 80)** est systématiquement redirigé vers **HTTPS (443)**
+  par une règle `return 301`.
+- Le reverse proxy termine le **TLS** (certificat auto-signé) et relaie les
+  requêtes vers l'application en transmettant les en-têtes `X-Forwarded-*`.
+- L'application et la base **n'exposent leurs ports que sur le réseau privé**
+  (binding sur l'IP interne), elles sont donc inaccessibles depuis l'extérieur.
+
+**Rôle du reverse proxy :** il constitue l'unique point d'entrée. Il centralise la
+terminaison TLS, masque la topologie interne, et permettrait à terme d'ajouter de
+la répartition de charge, du cache ou un pare-feu applicatif sans toucher à
+l'application.
+
 ## 3. Description de l'infrastructure virtualisée
 
 L'hyperviseur retenu est **KVM/libvirt**, solution de virtualisation open source
@@ -82,7 +104,7 @@ Terraform recrée automatiquement disque, cloud-init et domaine via `for_each`.
 L'environnement est ainsi **idempotent et reproductible** : `terraform destroy`
 puis `terraform apply` reconstruit un état identique.
 
-## 4. Déploiement automatisé (provisioning)
+## 4. Présentation du déploiement automatisé
 
 Une fois les VM démarrées par Terraform, la configuration est prise en charge par
 **Ansible** (`ansible/`), choisi pour son fonctionnement *agentless* (pilotage par
@@ -104,7 +126,7 @@ L'inventaire (`inventory.ini`) associe chaque groupe d'hôtes à son IP. Le
 déploiement complet tient donc en une seule commande, et peut être relancé sans
 effet de bord.
 
-## 5. Conteneurisation
+## 5. Description de la conteneurisation
 
 Chaque service tourne dans son propre **conteneur Docker**, piloté par un fichier
 `docker-compose` distinct sur chaque VM.
@@ -130,30 +152,7 @@ même image fonctionne quel que soit l'environnement. L'application attend
 activement que PostgreSQL réponde avant de démarrer et expose un *endpoint*
 `/health` exploitable pour la supervision.
 
-## 6. Réseau et accès
-
-**Plan d'adressage** — réseau privé NAT `10.10.0.0/24`, passerelle `10.10.0.1`,
-adresses fixes attribuées par cloud-init (`.10`, `.20`, `.30`).
-
-**Flux réseau :**
-
-```
-Client ─HTTPS:443─▶ NGINX (10.10.0.10) ─HTTP:8000─▶ App (10.10.0.20) ─TCP:5432─▶ PostgreSQL (10.10.0.30)
-```
-
-- Le trafic **HTTP (port 80)** est systématiquement redirigé vers **HTTPS (443)**
-  par une règle `return 301`.
-- Le reverse proxy termine le **TLS** (certificat auto-signé, bonus HTTPS) et relaie
-  les requêtes vers l'application en transmettant les en-têtes `X-Forwarded-*`.
-- L'application et la base **n'exposent leurs ports que sur le réseau privé**
-  (binding sur l'IP interne), elles sont donc inaccessibles depuis l'extérieur.
-
-**Rôle du reverse proxy :** il constitue l'unique point d'entrée. Il centralise la
-terminaison TLS, masque la topologie interne, et permettrait à terme d'ajouter de
-la répartition de charge, du cache ou un pare-feu applicatif sans toucher à
-l'application.
-
-## 7. Analyse et justification des choix techniques
+## 6. Analyse et justification des choix techniques
 
 **Choix des technologies.** KVM/libvirt, Terraform, Ansible, Docker et NGINX sont
 tous **open source**, largement documentés et représentatifs des standards de
@@ -183,7 +182,7 @@ dans les variables Ansible (à externaliser via Ansible Vault en production). En
 il n'y a ni sauvegarde automatisée ni supervision centralisée — ce sont des axes
 d'amélioration identifiés ci-dessous.
 
-## 8. Conclusion
+## 7. Conclusion
 
 Le projet démontre une chaîne complète et cohérente : Terraform provisionne une
 infrastructure virtualisée reproductible, Ansible la configure de façon idempotente,
@@ -196,7 +195,7 @@ continue.
 
 ---
 
-## Déploiement
+## Annexe — Déploiement
 
 ```bash
 # 1. Infrastructure (VMs, réseau, cloud-init)
@@ -211,14 +210,14 @@ ansible-playbook site.yml
 # 3. Accès : https://10.10.0.10/   (certificat auto-signé)
 ```
 
-## Arborescence
+## Annexe — Arborescence
 
 - `terraform/` — IaC : VM, disques, réseau NAT, cloud-init
 - `ansible/`   — provisioning, 4 rôles (`common`, `database`, `app`, `reverse_proxy`)
 - `app/`       — application Node.js + Express et son `Dockerfile`
 - `schema/`    — schéma d'architecture (`architecture.png`)
 
-## Pistes bonus
+## Annexe — Pistes bonus
 
 HTTPS (déjà en place via certificat auto-signé) · supervision (endpoint `/health`)
 · sauvegardes du volume PostgreSQL · haute disponibilité · intégration continue.
