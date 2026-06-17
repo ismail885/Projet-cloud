@@ -96,7 +96,7 @@ function page(memos) {
       <button type="submit">Publier</button>
     </form>
 
-    <ul>${lignes || '<li class="meta">Aucun mémo pour l\\'instant.</li>'}</ul>
+    <ul>${lignes || '<li class="meta">Aucun mémo pour l\'instant.</li>'}</ul>
 
     <footer>
       Servi par le conteneur applicatif <code>${escape(os.hostname())}</code><br>
