@@ -2,12 +2,17 @@
 title: "Déploiement automatisé d'une application web conteneurisée"
 subtitle: "Infrastructure virtualisée, reproductible et automatisée pour l'hébergement d'une application interne"
 author: "Abou-zaid Ismail — Module Cloud Computing, École Hexagone (B3)"
+mainfont: "Arial"
+monofont: "Cascadia Mono"
+header-includes:
+  - \usepackage[none]{hyphenat}
+  - \sloppy
 ---
 
 ## 1. Introduction et contexte
 
-Une PME exploite une application web interne — un outil de mémos d'équipe
-(notes courtes partagées entre collègues) — historiquement installée à la main
+Une PME exploite une application web interne un outil de mémos d'équipe
+(notes courtes partagées entre collègues) historiquement installée à la main
 sur un serveur unique. Cette organisation présente trois faiblesses concrètes :
 les déploiements ne sont pas reproductibles (chaque réinstallation diffère
 légèrement), la moindre opération de maintenance est risquée car il n'existe pas

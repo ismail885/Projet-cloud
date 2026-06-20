@@ -1,6 +1,5 @@
 ---
-# Playbook principal : installe Docker partout, puis déploie chaque service
-# dans l'ordre base de données -> application -> reverse proxy.
+# Playbook principal : installe Docker partout, puis déploie chaque service dans l'ordre base de données -> application -> reverse proxy.
 
 - name: Préparation commune (Docker + Compose) sur toutes les VMs
   hosts: all

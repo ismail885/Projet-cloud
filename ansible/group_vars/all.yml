@@ -3,7 +3,6 @@ db_host: "10.10.0.30"
 db_port: 5432
 db_name: "techapp"
 db_user: "techapp"
-db_password: "S3cret_demo!"   # en prod : vault Ansible, ici en clair pour la démo
-
+db_password: "S3cret_demo!"
 app_host: "10.10.0.20"
 app_port: 8000

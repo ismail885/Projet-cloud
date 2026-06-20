@@ -11,12 +11,9 @@ users:
     ssh_authorized_keys:
       - ${ssh_key}
 
-# Agent qemu (remontée d'IP vers Terraform) + python pour Ansible
 packages:
   - qemu-guest-agent
   - python3
 
 runcmd:
   - systemctl enable --now qemu-guest-agent
-
-# Pas d'installation applicative ici : c'est le rôle d'Ansible.

@@ -5,8 +5,7 @@ const { Pool } = require("pg");
 const app = express();
 app.use(express.urlencoded({ extended: false }));
 
-// Paramètres de connexion injectés via variables d'environnement par
-// docker-compose (voir compose.yml du rôle "app").
+// Paramètres de connexion injectés via variables d'environnement par docker-compose (voir compose.yml du rôle "app").
 const pool = new Pool({
   host: process.env.DB_HOST || "db",
   port: parseInt(process.env.DB_PORT || "5432", 10),
@@ -18,8 +17,7 @@ const pool = new Pool({
 
 const PORT = parseInt(process.env.APP_PORT || "8000", 10);
 
-// Attend que PostgreSQL réponde avant de démarrer (au premier boot, la base
-// n'est pas toujours prête) puis crée la table si besoin.
+// Attend que PostgreSQL réponde avant de démarrer (au premier boot, la base n'est pas toujours prête) puis crée la table si besoin.
 async function initDb(retries = 30) {
   for (let i = 1; i <= retries; i++) {
     try {
