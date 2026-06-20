@@ -61,7 +61,19 @@ attribuée par cloud-init au premier démarrage. Le flux applicatif suit toujour
 même chemin :
 
 ```
-Client ─HTTPS:443─▶ NGINX (10.10.0.10) ─HTTP:8000─▶ App (10.10.0.20) ─TCP:5432─▶ PostgreSQL (10.10.0.30)
+   Client (navigateur)
+      │
+      │  HTTPS : 443
+      ▼
+   NGINX · reverse proxy          10.10.0.10
+      │
+      │  HTTP : 8000
+      ▼
+   App · Node.js + Express        10.10.0.20
+      │
+      │  TCP : 5432
+      ▼
+   PostgreSQL                     10.10.0.30
 ```
 
 Les règles d'accès sont les suivantes :
